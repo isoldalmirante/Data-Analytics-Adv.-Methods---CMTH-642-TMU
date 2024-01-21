@@ -1,0 +1,142 @@
+---
+title: 'CMTH 642 Data Analytics: Advanced Methods Assignment 1'
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+
+Assignment 1 is worth 10% of the final grade. Submit the .rmd file and the generated output file (either in PDF, Word or HTML format). Failing to submit both files will be subject to a mark deduction.
+
+Preparation:
+
+The dataset is related to Forest Fires. For more info:
+https://archive.ics.uci.edu/ml/datasets/forest+fires
+
+
+### 1. Read the csv file from the this URL https://archive.ics.uci.edu/ml/machine-learning-databases/forest-fires/forestfires.csv.   Save it to a data frame called Forest. Check the first six records.  (10 points)
+```{r}
+# Load required package and read the CSV file
+library(readr)
+Forest <- read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/forest-fires/forestfires.csv")
+
+# First six records of the data frame
+head(Forest)
+```
+
+### 2. How many observations are there in the dataset? How many observations are there with both a fire (burned area > 0) and rain? (10 points)
+```{r}
+# Number of observations in the data frame
+nrow(Forest)
+
+# Create a subset of the data frame that only contains rows where the burned area and where the rain is greater than 0
+Forest_burned <- Forest[Forest$area > 0, ]
+
+Forest_rain <- Forest[Forest$rain > 0, ]
+
+# Number of observations where both conditions are true
+nrow(intersect(Forest_burned, Forest_rain))
+```
+
+### 3. Show the columns month, day, area of all the observations with a fire (burned area > 0). (10 points)
+```{r}
+# Create subset
+Forest_burned <- Forest[Forest$area > 0, ]
+
+# Select the columns of interest
+Forest_burned[, c("month", "day", "area")]
+
+```
+
+### 4. How large are the five largest fires (i.e. having largest area)? (10 points)
+```{r}
+library(dplyr)
+
+# Sort the data frame by area in descending order and select the top five rows
+largest_fires <- head(arrange(Forest, desc(area)), 5)
+
+largest_fires$area
+
+```
+
+### 5. For the records you obtained from the previous question, what are the corresponding month, temp, RH, wind, rain, area? (10 points)
+```{r}
+largest_fires[, c("month", "temp", "RH", "wind", "rain", "area")]
+```
+
+### 6. For the whole dataset, reorder factor levels of month to be from Jan to Dec. (10 points)
+```{r}
+# Reorder the factor levels of the month column
+Forest$month <- factor(Forest$month, levels = c("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"))
+levels(Forest$month)
+
+```
+### 7. Add one column to the dataframe indicating whether a fire occurred for each observation ('TRUE' for area>0 and 'FALSE' for area==0). (10 points)
+```{r}
+# Create a new column indicating whether a fire occurred
+Forest$fire_occurred <- ifelse(Forest$area > 0, TRUE, FALSE)
+head(Forest)
+
+```
+### 8. What is the mean area/wind/temp/RH per month? (10 points)
+```{r}
+# Group the data by month and calculate the mean area, wind, temp, and RH
+Forest %>%
+  group_by(month) %>%
+  summarize(mean_area = mean(area),
+            mean_wind = mean(wind),
+            mean_temp = mean(temp),
+            mean_RH = mean(RH))
+
+```
+
+### 9. How many observations are there in each month? Visualize by using a bar plot in descending order. (10 points)
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# Define colors of the bars
+colors <- c("#619CFF", "#00D166", "#FF7F00", "#FF006E", "#B15AED", "#6A4C93", 
+               "#FFC100", "#6DD9EC", "#FF006E", "#00D166", "#619CFF", "#B15AED")
+
+# Count observations by month
+count_df <- Forest %>% 
+  group_by(month) %>% 
+  summarize(n = n())
+
+# Create the plot
+ggplot(count_df, aes(x = reorder(month, -n), y = n, fill = month)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Month", y = "Number of observations") +
+  theme_bw() +
+  scale_fill_manual(values = colors)
+
+
+
+```
+
+### 10. How many observations are there with burned area greater than zero in each month? Visualize by using a bar plot in descending order. (10 points)
+```{r}
+
+# Define color palette
+colors <- c("#619CFF", "#00D166", "#FF7F00", "#FF006E", "#B15AED", "#6A4C93", 
+               "#FFC100", "#6DD9EC", "#FF006E", "#00D166", "#619CFF", "#B15AED")
+
+# Count observations with area > 0 by month
+count_df <- Forest %>% 
+  filter(area > 0) %>% 
+  group_by(month) %>% 
+  summarize(n = n())
+
+# Create the plot with custom colors
+ggplot(count_df, aes(x = reorder(month, -n), y = n, fill = month)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Month", y = "Observations with area > 0") +
+  theme_bw() +
+  scale_fill_manual(values = colors)
+
+```
+
+This is the end of Assignment 1 
+
+Ceni Babaoglu, PhD
