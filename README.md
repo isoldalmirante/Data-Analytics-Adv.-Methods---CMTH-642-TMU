@@ -1,6 +1,7 @@
 **Assignments completed for the Data Analytics Advanced Methods course Spring/Summer 2023**
 
 **Course Description**
+
 This course builds on the previous Basic Methods course and covers more advanced concepts including classification and clustering algorithms, decision trees, linear and logistic regression, 
 time series analysis, and text analytics. The course will provide applied knowledge on how to analyze large scale network data produced through social media. In this context topics include 
 network community detection, techniques for link analysis, information propagation on the web and information analysis of social media.
